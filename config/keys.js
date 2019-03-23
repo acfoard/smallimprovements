@@ -1,0 +1,1 @@
+module.exports = "mongodb+srv://kudoUser1:funfunfun@cluster0-dofrr.mongodb.net/tinyImprovements?retryWrites=true"

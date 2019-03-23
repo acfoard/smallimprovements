@@ -1,10 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const MONGODB_URI = require('./config/keys');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-mongoose.connect('mongodb://localhost/tinyImprovements', { useNewUrlParser: true });
+mongoose.connect(MONGODB_URI || 'mongodb://localhost/tinyImprovements', { useNewUrlParser: true });
 
 // Define middleware here
 app.use(express.urlencoded({ extended: true }));
