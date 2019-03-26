@@ -38,6 +38,7 @@ class AddKudo extends Component {
         kudoTo: '',
         kudoFrom: ''
       });
+      this.toggle();
       this.props.populateKudoList();
     });
   };
@@ -74,18 +75,17 @@ class AddKudo extends Component {
               <MDBCol md="6">
                 <form>
                   <div>
-                    <select name='kudoTo'className="browser-default custom-select">
+                    <select name='kudoTo' className="browser-default custom-select" onChange={this.changeHandler}>
                       <option>Who is the Kudo for?</option>
                       {this.state.userList.map(user => (
                         <UserName username={user.username}
                         id={user._id}
-                        key={user._id}
-                        name='kudoTo' />
+                        key={user._id} />
                       ))}
                     </select>
                   </div>
                   <div>
-                    <select className="browser-default custom-select">
+                    <select onChange={this.changeHandler} name='kudoFrom' className="browser-default custom-select">
                       <option>Who is the Kudo from? </option>
                       {this.state.userList.map(user => (
                         <UserName username={user.username}
