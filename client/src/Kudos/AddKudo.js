@@ -1,94 +1,145 @@
-import React, { Component } from 'react';
-import { MDBContainer, MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter, MDBRow, MDBCol, MDBBtn} from 'mdbreact';
-import UserName from './UserName';
-import * as $ from 'axios';
+import React, { Component } from "react";
+import {
+  MDBContainer,
+  MDBModal,
+  MDBModalBody,
+  MDBModalHeader,
+  MDBModalFooter,
+  MDBRow,
+  MDBCol,
+  MDBBtn
+} from "mdbreact";
+import UserName from "./UserName";
+import * as $ from "axios";
 
 class AddKudo extends Component {
-    state = {
-        modal: false,
-        userList: []
-    }
+  state = {
+    modal: false,
+    userList: [],
+    kudoTitle: '',
+    kudoBody: '',
+    kudoTo: '',
+    kudoFrom: ''
+  };
 
-    populateUserList = () => {
-        $.get('/api/user')
-            .then(users => {
-                this.setState({ userList: users.data })
-            })
+  addKudo = e => {
+    e.preventDefault();
+    const newKudo = {
+      toId: this.state.kudoTo,
+      fromId: this.state.kudoFrom,
+      title: this.state.kudoTitle,
+      body: this.state.kudoBody
     };
+    console.log(newKudo);
+    $.post("/api/kudo", newKudo).then(response => {
+      this.setState({
+        kudoTitle: "",
+        kudoBody: "",
+        kudoTo: '',
+        kudoFrom: ''
+      });
+      this.props.populateKudoList();
+    });
+  };
 
-    componentDidMount() {
-        this.populateUserList();
-    };
+  changeHandler = e => {
+    const { name, value } = e.target;
+    this.setState({ [name]: value });
+  };
 
-    toggle = () => {
-        this.setState({
-            modal: !this.state.modal
-        });
-    }
+  populateUserList = () => {
+    $.get("/api/user").then(users => {
+      this.setState({ userList: users.data });
+    });
+  };
 
-    render(props) {
-        return (
-            <MDBContainer>
-                <MDBBtn onClick={this.toggle}>Modal</MDBBtn>
-                <MDBModal isOpen={this.state.modal} toggle={this.toggle}>
-                    <MDBModalHeader toggle={this.toggle}>Send a Kudo</MDBModalHeader>
-                    <MDBModalBody>
-                        <MDBRow>
-                            <MDBCol md="6">
-                                <form>
-                                    <div>
-                                        <select className="browser-default custom-select">
-                                            <option>Choose your option</option>
-                                            {this.state.userList.map(user => 
-                                                <UserName name={user.username}/>
-                                            )}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <select className="browser-default custom-select">
-                                            <option>Choose your option</option>
-                                            {this.state.userList.map(user => 
-                                                <UserName name={user.username}/>
-                                            )}
-                                        </select>
-                                    </div>
-                                    <br />
-                                    <label
-                                        htmlFor="defaultFormContactSubjectEx"
-                                        className="grey-text"
-                                    >
-                                        Subject
-            </label>
-                                    <input
-                                        type="text"
-                                        id="defaultFormContactSubjectEx"
-                                        className="form-control"
-                                    />
-                                    <br />
-                                    <label
-                                        htmlFor="defaultFormContactMessageEx"
-                                        className="grey-text"
-                                    >
-                                        Your message
-            </label>
-                                    <textarea
-                                        type="text"
-                                        id="defaultFormContactMessageEx"
-                                        className="form-control"
-                                        rows="3"
-                                    />
-                                </form>
-                            </MDBCol>
-                        </MDBRow>
-        </MDBModalBody>
-                    <MDBModalFooter>
-                        <MDBBtn color="secondary" onClick={this.toggle}>Close</MDBBtn>
-                        <MDBBtn color="primary">Save changes</MDBBtn>
-                    </MDBModalFooter>
-                </MDBModal>
-            </MDBContainer>
-        );
-    }
+  componentDidMount() {
+    this.populateUserList();
+  }
+
+  toggle = () => {
+    this.setState({
+      modal: !this.state.modal
+    });
+  };
+
+  render() {
+    return (
+      <MDBContainer>
+        <MDBBtn onClick={this.toggle}>Send a Kudo</MDBBtn>
+        <MDBModal isOpen={this.state.modal} toggle={this.toggle}>
+          <MDBModalHeader toggle={this.toggle}>Send a Kudo</MDBModalHeader>
+          <MDBModalBody>
+            <MDBRow>
+              <MDBCol md="6">
+                <form>
+                  <div>
+                    <select name='kudoTo'className="browser-default custom-select">
+                      <option>Who is the Kudo for?</option>
+                      {this.state.userList.map(user => (
+                        <UserName username={user.username}
+                        id={user._id}
+                        key={user._id}
+                        name='kudoTo' />
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <select className="browser-default custom-select">
+                      <option>Who is the Kudo from? </option>
+                      {this.state.userList.map(user => (
+                        <UserName username={user.username}
+                        id={user._id}
+                        key={user._id}
+                        name='kudoFrom' />
+                      ))}
+                    </select>
+                  </div>
+                  <br />
+                  <label
+                    htmlFor="defaultFormContactSubjectEx"
+                    className="grey-text"
+                  >
+                    Kudo Subject
+                  </label>
+                  <input
+                    type="text"
+                    id="defaultFormContactSubjectEx"
+                    className="form-control"
+                    value={this.state.kudoTitle}
+                    onChange={this.changeHandler}
+                    name="kudoTitle"
+                  />
+                  <br />
+                  <label
+                    htmlFor="defaultFormContactMessageEx"
+                    className="grey-text"
+                  >
+                    Kudo text
+                  </label>
+                  <textarea
+                    type="text"
+                    id="defaultFormContactMessageEx"
+                    className="form-control"
+                    rows="3"
+                    value={this.state.kudoBody}
+                    onChange={this.changeHandler}
+                    name="kudoBody"
+                  />
+                </form>
+              </MDBCol>
+            </MDBRow>
+          </MDBModalBody>
+          <MDBModalFooter>
+            <MDBBtn color="secondary" onClick={this.toggle}>
+              Close
+            </MDBBtn>
+            <MDBBtn color="primary" onClick={this.addKudo}>Send Kudo</MDBBtn>
+          </MDBModalFooter>
+        </MDBModal>
+      </MDBContainer>
+    );
+  }
 }
 
-export default AddKudo
+export default AddKudo;
